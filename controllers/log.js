@@ -2,6 +2,7 @@
 
 const validate = require("jsonschema").validate;
 const mongoose = require("mongoose");
+const moment   = require("moment");
 
 const Measurement   = require("../models/measurement");
 const error_types   = require("../middleware/error_types");
@@ -44,12 +45,12 @@ let controller = {
 
     /**
      * Parameters via query:
-     *  -date: String - 2019-09-14
+     *  -date: {String} - 2019-09-14
      */
     getData: (req, res, next) => {
-        const date = new Date();
-        const date_next = new Date(2019,8,15);
-        Measurement.findOne({ created_on: {$gte: date, $lte: date_next} })
+        const date = new moment(req.params.date, "YYYY-MM-DD").valueOf();
+        const date_next = new moment(date).add(24, "hours").valueOf();
+        Measurement.find({ created_on: {$gte: date, $lte: date_next} })
             .then(data=>{res.json({data:data});})
             .catch(err=>next(err));
     }
