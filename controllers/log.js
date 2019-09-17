@@ -2,7 +2,7 @@
 
 const validate = require("jsonschema").validate;
 const mongoose = require("mongoose");
-const moment   = require("moment");
+const moment   = require("moment-timezone");
 
 const Measurement   = require("../models/measurement");
 const error_types   = require("../middleware/error_types");
@@ -51,7 +51,17 @@ let controller = {
         const date = new moment(req.params.date, "YYYY-MM-DD").valueOf();
         const date_next = new moment(date).add(24, "hours").valueOf();
         Measurement.find({ created_on: {$gte: date, $lte: date_next} })
-            .then(data=>{res.json({data:data});})
+            .then(data=>{
+                res.json(data.map(d=>(
+                    {
+                        _id: d._id,
+                        temperature: d.temperature,
+                        humidity: d.humidity,
+                        pressure: d.pressure,
+                        created_on: moment(d.created_on).tz('Europe/Madrid').format("DD-MM-YYYY HH:mm:ss"),
+                    }
+                )));
+            })
             .catch(err=>next(err));
     }
 };
