@@ -14,7 +14,7 @@ const LogController = require("../controllers/log");
 //router.get("/users", md_auth.ensureAuthenticated, UserController.getUsers);
 //router.get("/users/me", md_auth.ensureAuthenticated, UserController.getMe);
 //router.get("/users/avatar/:image", UserController.getAvatarImage);
-router.get("/logging/log/:date", md_auth.ensureAuthenticated, LogController.getData);
+router.get("/logging/log/:date/:station_id", md_auth.ensureAuthenticated, LogController.getData);
 router.post("/logging/log", md_auth.ensureAuthenticated, multipartMiddleware, LogController.logData);
 //router.delete("/users/:id", md_auth.ensureAuthenticated, UserController.deleteUser);
 

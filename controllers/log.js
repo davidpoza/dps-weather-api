@@ -16,23 +16,20 @@ let controller = {
 
     /**
      * Parameters via body:
-     *  -desc: String
-     *  -date: String
-     *  -start_hour: String
-     *  -end_hour: String
-     *  -tags: [ObjectId]
-     *  -project: ObjectId
-     *  -hour_value: float
+     *  -temperature: {String}
+     *  -humidity: {String}
+     *  -pressure: {String}
+     *  -station_id: {String}
      */
     logData: (req, res, next) => {
         //let validation = validate(req.body, valid_schemas.create_task);
         //if(!validation.valid)
         //    throw validation.errors;
-        console.log(req.body);
         let document = Measurement({
             temperature: req.body.temperature,
             humidity: req.body.humidity,
             pressure: req.body.pressure,
+            station_id: req.body.station_id,
         });
 
 
@@ -46,11 +43,12 @@ let controller = {
     /**
      * Parameters via query:
      *  -date: {String} - 2019-09-14
+     *  -station_id : {String} - HOME_INDOOR
      */
     getData: (req, res, next) => {
         const date = new moment(req.params.date, "YYYY-MM-DD").valueOf();
         const date_next = new moment(date).add(24, "hours").valueOf();
-        Measurement.find({ created_on: {$gte: date, $lte: date_next} })
+        Measurement.find({ station_id: req.params.station_id ,created_on: {$gte: date, $lte: date_next} })
             .then(data=>{
                 res.json(data.map(d=>(
                     {
@@ -58,6 +56,7 @@ let controller = {
                         temperature: d.temperature,
                         humidity: d.humidity,
                         pressure: d.pressure,
+                        station_id: d.station_id,
                         created_on: moment(d.created_on).tz('Europe/Madrid').format("DD-MM-YYYY HH:mm:ss"),
                     }
                 )));

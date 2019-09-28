@@ -12,6 +12,7 @@ const LogSchema = Schema({
     uvi             : Number,
     notes           : String,
     created_on      : Date,
+    station_id      : String,
 });
 
 LogSchema.pre("save", function(next){
