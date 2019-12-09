@@ -1,6 +1,6 @@
-"use strict";
+'use strict';
 
-const mongoose    = require("mongoose");
+const mongoose    = require('mongoose');
 const Schema      = mongoose.Schema;
 
 const LogSchema = Schema({
@@ -15,9 +15,9 @@ const LogSchema = Schema({
     station_id      : String,
 });
 
-LogSchema.pre("save", function(next){
+LogSchema.pre('save', function(next){
     this.created_on = new Date();
     return next();
 });
 
-module.exports = mongoose.model("Measurement", LogSchema, "measurements");
+module.exports = mongoose.model('Measurement', LogSchema, 'measurements');

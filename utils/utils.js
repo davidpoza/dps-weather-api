@@ -1,5 +1,5 @@
-const fs   = require("fs");
-const path = require("path");
+const fs   = require('fs');
+const path = require('path');
 
 const utils = {
     validEmail: (email) => {
@@ -13,7 +13,7 @@ const utils = {
     },
 
     getIp: (req)=>{
-        let ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
+        let ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
         return ip;
     },
 
@@ -52,7 +52,7 @@ const utils = {
         Rellenando si es necesario con ceros por la izquierda */
     pad(str, max) {
         str = str.toString();
-        return str.length < max ? this.pad("0" + str, max) : str;
+        return str.length < max ? this.pad('0' + str, max) : str;
     },
 
     standarizeDate(date){

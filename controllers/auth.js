@@ -1,14 +1,14 @@
-"use strict";
+'use strict';
 
-const validate = require("jsonschema").validate;
-const bcrypt   = require("bcrypt");
-const passport = require("passport");
-const jwt      = require("jsonwebtoken");
+const validate = require('jsonschema').validate;
+const bcrypt   = require('bcrypt');
+const passport = require('passport');
+const jwt      = require('jsonwebtoken');
 /*  */
-const User          = require("../models/user");
-const error_types   = require("../middleware/error_types");
-const valid_schemas = require("../utils/valid_schemas");
-const logger        = require("../utils/logger");
+const User          = require('../models/user');
+const error_types   = require('../middleware/error_types');
+const valid_schemas = require('../utils/valid_schemas');
+const logger        = require('../utils/logger');
 
 
 let controller = {
@@ -17,15 +17,15 @@ let controller = {
     en este caso se realiza contra una base de datos asi que es muy sencillo hacerlo nosotros.
     */
     register: (req, res, next) => {
-        logger.log({message:"intento de registro de usuario", level:"info", req });
+        logger.log({message:'intento de registro de usuario', level:'info', req });
 
         User.findOne({ email: req.body.email.toLowerCase() })
             .then(data => { //si la consulta se ejecuta
                 if (data) { //si el usuario existe
-                    throw new error_types.InfoError("user already exists");
+                    throw new error_types.InfoError('user already exists');
                 }
                 else { //si no existe el usuario se crea/registra
-                    logger.log({message:"Usuario registrado", level:"info", req });
+                    logger.log({message:'Usuario registrado', level:'info', req });
                     let validation = validate(req.body, valid_schemas.register_user);
                     if(!validation.valid)
                         throw validation.errors;
@@ -33,8 +33,8 @@ let controller = {
                     var hash = bcrypt.hashSync(req.body.password, parseInt(process.env.BCRYPT_ROUNDS));
                     let document = new User({
                         email: req.body.email.toLowerCase(),
-                        first_name: req.body.first_name || "",
-                        last_name: req.body.last_name || "",
+                        first_name: req.body.first_name || '',
+                        last_name: req.body.last_name || '',
                         password: hash,
                         admin: false,
                         active: false,
@@ -53,16 +53,16 @@ let controller = {
             });
     },
     login: (req, res, next) => {
-        logger.log({message:"Intento de login", level:"info", req });
+        logger.log({message:'Intento de login', level:'info', req });
 
-        passport.authenticate("local", { session: false }, (error, user) => {
-            //console.log("ejecutando *callback auth* de authenticate para estrategia local");
+        passport.authenticate('local', { session: false }, (error, user) => {
+            //console.log('ejecutando *callback auth* de authenticate para estrategia local');
 
             //si hubo un error en el callback verify relacionado con la consulta de datos de usuario
             if (error) {
                 next(new error_types.Error404(error.message));
             }else {
-                //console.log("*** comienza generacion token*****");
+                //console.log('*** comienza generacion token*****');
                 const payload = {
                     sub: user._id,
                     exp: Date.now() + parseInt(process.env.JWT_LIFETIME),
@@ -85,7 +85,7 @@ let controller = {
         })(req, res);
     },
     refresh: (req, res, next) => {
-        logger.log({message:"refresh de jwt", level:"info", req });
+        logger.log({message:'refresh de jwt', level:'info', req });
         const payload = {
             sub: req.user._id,
             exp: Date.now() + parseInt(process.env.JWT_LIFETIME),

@@ -1,28 +1,28 @@
-"use strict";
+'use strict';
 
-const express       = require("express");
-const bcrypt        = require("bcrypt");
-const bodyParser    = require("body-parser");
-const passport      = require("passport");
-const JwtStrategy   = require("passport-jwt").Strategy;
-const LocalStrategy = require("passport-local").Strategy;
-const ExtractJwt    = require("passport-jwt").ExtractJwt;
-const cors          = require("cors");
-const rateLimit     = require("express-rate-limit");
-const helmet        = require("helmet");
+const express       = require('express');
+const bcrypt        = require('bcrypt');
+const bodyParser    = require('body-parser');
+const passport      = require('passport');
+const JwtStrategy   = require('passport-jwt').Strategy;
+const LocalStrategy = require('passport-local').Strategy;
+const ExtractJwt    = require('passport-jwt').ExtractJwt;
+const cors          = require('cors');
+const rateLimit     = require('express-rate-limit');
+const helmet        = require('helmet');
 const app           = express();
 
 // cargamos archivo de rutas
-const User           = require("./models/user");
-const auth_routes    = require("./routes/auth");
-const user_routes    = require("./routes/user");
-const logging_routes = require("./routes/log");
-const errorMdw       = require("./middleware/errors");
-const logger         = require("./utils/logger");
+const User           = require('./models/user');
+const auth_routes    = require('./routes/auth');
+const user_routes    = require('./routes/user');
+const logging_routes = require('./routes/log');
+const errorMdw       = require('./middleware/errors');
+const logger         = require('./utils/logger');
 
 app.use(helmet({
     frameguard: {
-        action: "deny"
+        action: 'deny'
     },
     contentSecurityPolicy: {
         directives: {
@@ -30,19 +30,19 @@ app.use(helmet({
         }
     }
 }));
-app.use(cors("*"));
+app.use(cors('*'));
 
 passport.use(new LocalStrategy({
-    usernameField: "email",
-    passwordField: "password",
+    usernameField: 'email',
+    passwordField: 'password',
     session: false
 }, (email, password, done)=>{
-    logger.log({message:"ejecutando *callback verify* de estategia local", level:"debug" });
+    logger.log({message:'ejecutando *callback verify* de estategia local', level:'debug' });
     User.findOne({email:email.toLowerCase()})
         .then(data=>{
-            if(data === null) throw new Error("User does not exist"); //el usuario no existe
-            else if(data.active != true) throw new Error("Account is not active");
-            else if(!bcrypt.compareSync(password, data.password)) throw new Error("Wrong password"); //no coincide la password
+            if(data === null) throw new Error('User does not exist'); //el usuario no existe
+            else if(data.active != true) throw new Error('Account is not active');
+            else if(!bcrypt.compareSync(password, data.password)) throw new Error('Wrong password'); //no coincide la password
             return done(null, data); //login ok
         })
         .catch(err=>done(err, null)); // error en DB
@@ -55,7 +55,7 @@ opts.secretOrKey = process.env.JWT_SECRET;
 opts.algorithms = [process.env.JWT_ALGORITHM];
 
 passport.use(new JwtStrategy(opts, (jwt_payload, done)=>{
-    logger.log({message:"ejecutando *callback verify* de estategia jwt", level:"debug" });
+    logger.log({message:'ejecutando *callback verify* de estategia jwt', level:'debug' });
     User.findOne({_id: jwt_payload.sub})
         .then(data=>{
             if (data === null) { //no existe el usuario
@@ -83,9 +83,9 @@ const authApiLimiter = rateLimit({
 });
 
 
-app.set("trust proxy", 1); //permitimos que se use el proxy de apache
-app.use("/api/", globalApiLimiter); // solo aplicamos el limite de peticiones a la api
-app.use("/api/auth", authApiLimiter); // solo aplicamos el limite de peticiones a la api
+app.set('trust proxy', 1); //permitimos que se use el proxy de apache
+app.use('/api/', globalApiLimiter); // solo aplicamos el limite de peticiones a la api
+app.use('/api/auth', authApiLimiter); // solo aplicamos el limite de peticiones a la api
 
 app.use(bodyParser.urlencoded({extended:false}));//para que todo lo que llegue por body lo convierta a un objeto json
 app.use(bodyParser.json());
@@ -94,9 +94,9 @@ app.use(passport.initialize());
 
 
 //rutas
-app.use("/api/auth", auth_routes);
-app.use("/api", user_routes);
-app.use("/api", logging_routes);
+app.use('/api/auth', auth_routes);
+app.use('/api', user_routes);
+app.use('/api', logging_routes);
 
 
 //error Middleware

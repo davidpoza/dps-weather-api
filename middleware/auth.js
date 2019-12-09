@@ -1,6 +1,6 @@
-"use strict";
-const passport          = require("passport");
-const error_types       = require("./error_types");
+'use strict';
+const passport          = require('passport');
+const error_types       = require('./error_types');
 
 let auth_middlewares = {
 
@@ -13,8 +13,8 @@ let auth_middlewares = {
     para que sean tipo json.
     */
     ensureAuthenticated: (req,res,next)=>{
-        passport.authenticate("jwt", {session: false}, (err, user, info)=>{
-            // console.log("ejecutando *callback auth* de authenticate para estrategia jwt");
+        passport.authenticate('jwt', {session: false}, (err, user, info)=>{
+            // console.log('ejecutando *callback auth* de authenticate para estrategia jwt');
             //si hubo un error relacionado con la validez del token (error en su firma, caducado, etc)
             if(info){ return next(new error_types.Error401(info.message)); }
 
@@ -22,7 +22,7 @@ let auth_middlewares = {
             if (err) { return next(err); }
 
             //si el token está firmado correctamente pero no pertenece a un usuario existente
-            if (!user) { return next(new error_types.Error403("You are not allowed to access.")); }
+            if (!user) { return next(new error_types.Error403('You are not allowed to access.')); }
 
             //inyectamos los datos de usuario en la request
             req.user = user;

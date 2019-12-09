@@ -1,13 +1,13 @@
-"use strict";
+'use strict';
 
-const validate = require("jsonschema").validate;
-const mongoose = require("mongoose");
-const moment   = require("moment-timezone");
+const validate = require('jsonschema').validate;
+const mongoose = require('mongoose');
+const moment   = require('moment-timezone');
 
-const Measurement   = require("../models/measurement");
-const error_types   = require("../middleware/error_types");
-const valid_schemas = require("../utils/valid_schemas");
-const utils         = require("../utils/utils");
+const Measurement   = require('../models/measurement');
+const error_types   = require('../middleware/error_types');
+const valid_schemas = require('../utils/valid_schemas');
+const utils         = require('../utils/utils');
 
 let controller = {
 
@@ -36,14 +36,13 @@ let controller = {
         document.save()
             .then(data=>{
                 res.json(data = {
-                        _id: data._id,
-                        temperature: data.temperature,
-                        humidity: data.humidity,
-                        pressure: data.pressure,
-                        station_id: data.station_id,
-                        created_on: moment(data.created_on).tz('Europe/Madrid').format("DD-MM-YYYY HH:mm:ss"),
-                    }
-                );
+                    _id: data._id,
+                    temperature: data.temperature,
+                    humidity: data.humidity,
+                    pressure: data.pressure,
+                    station_id: data.station_id,
+                    created_on: moment(data.created_on).tz('Europe/Madrid').format('DD-MM-YYYY HH:mm:ss'),
+                });
             })
             .catch(err=>next(err));
     },
@@ -54,8 +53,8 @@ let controller = {
      *  -station_id : {String} - HOME_INDOOR
      */
     getData: (req, res, next) => {
-        const date = new moment(req.params.date, "YYYY-MM-DD").valueOf();
-        const date_next = new moment(date).add(24, "hours").valueOf();
+        const date = new moment(req.params.date, 'YYYY-MM-DD').valueOf();
+        const date_next = new moment(date).add(24, 'hours').valueOf();
         Measurement.find({ station_id: req.params.station_id ,created_on: {$gte: date, $lte: date_next} })
             .then(data=>{
                 res.json(data.map(d=>(
@@ -65,7 +64,7 @@ let controller = {
                         humidity: d.humidity,
                         pressure: d.pressure,
                         station_id: d.station_id,
-                        created_on: moment(d.created_on).tz('Europe/Madrid').format("DD-MM-YYYY HH:mm:ss"),
+                        created_on: moment(d.created_on).tz('Europe/Madrid').format('DD-MM-YYYY HH:mm:ss'),
                     }
                 )));
             })
