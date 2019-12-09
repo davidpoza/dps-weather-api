@@ -69,7 +69,26 @@ let controller = {
                 )));
             })
             .catch(err=>next(err));
-    }
+    },
+
+    getLastData: (req, res, next) => {
+        Measurement.find({ station_id: req.params.station_id })
+        .sort({'created_on': 'descending'})
+        .limit(1)
+        .then(data=>{
+            res.json(data.map(d=>(
+                {
+                    _id: d._id,
+                    temperature: d.temperature,
+                    humidity: d.humidity,
+                    pressure: d.pressure,
+                    station_id: d.station_id,
+                    created_on: moment(d.created_on).tz('Europe/Madrid').format('DD-MM-YYYY HH:mm:ss'),
+                }
+            )));
+        })
+        .catch(err=>next(err));
+    },
 };
 
 module.exports = controller;
