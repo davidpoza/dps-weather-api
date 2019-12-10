@@ -16,10 +16,10 @@ let controller = {
 
     /**
      * Parameters via body:
-     *  -temperature: {String}
-     *  -humidity: {String}
-     *  -pressure: {String}
-     *  -station_id: {String}
+     *  @param {number} temperature - 21.2
+     *  @param {number} humidity - 57.8
+     *  @param {number} pressure - 1024.5
+     *  @param {ßtring} station_id - HOME_INDOOR
      */
     logData: (req, res, next) => {
         //let validation = validate(req.body, valid_schemas.create_task);
@@ -49,13 +49,13 @@ let controller = {
 
     /**
      * Parameters via query:
-     *  -date: {String} - 2019-09-14
-     *  -station_id : {String} - HOME_INDOOR
+     *  @param {string} date - 2019-09-14
+     *  @param {ßtring} station_id - HOME_INDOOR
      */
     getData: (req, res, next) => {
         const date = new moment(req.params.date, 'YYYY-MM-DD').valueOf();
         const date_next = new moment(date).add(24, 'hours').valueOf();
-        Measurement.find({ station_id: req.params.station_id ,created_on: {$gte: date, $lte: date_next} })
+        Measurement.find({ station_id: req.params.station_id, created_on: {$gte: date, $lte: date_next} })
             .then(data=>{
                 res.json(data.map(d=>(
                     {
@@ -86,6 +86,46 @@ let controller = {
                     created_on: moment(d.created_on).tz('Europe/Madrid').format('DD-MM-YYYY HH:mm:ss'),
                 }
             )));
+        })
+        .catch(err=>next(err));
+    },
+
+    /**
+     * Get the nearest measurement to the hour passed, looking for in a range of +-10 minutes.
+     * Parameters via query:
+     *  @param {string} date - YYYY-MM-DD HH:mm
+     *  @param {ßtring} station_id - HOME_INDOOR
+     */
+    getNearestData: (req, res, next) => {
+        const date = new moment.tz(req.params.date, 'YYYY-MM-DD HH:mm', 'Europe/Madrid');
+        const max = date.add(10, 'minutes').valueOf();
+        const min = date.subtract(20, 'minutes').valueOf(); //we substract 20 because add mutates object
+        date.add(10, 'minutes').valueOf(); //keep original date
+        Measurement.find({ station_id: req.params.station_id, created_on: {$gte: min, $lte: max}})
+        .then(data=>{
+            if (!Array.isArray(data) || data.length === 0) {
+                throw new error_types.Error404("There are no measurements.");
+            }
+            let diff = 10*60; // range amplitude in seconds
+            console.log("diff inicial",diff )
+            let index = 0;
+            data.forEach((m, i) => {
+                const currMeasurementDate = moment.tz(m.created_on, 'Europe/Madrid');
+                if (Math.abs(date.diff(currMeasurementDate, 'seconds')) < diff) {
+                    diff = Math.abs(date.diff(currMeasurementDate, 'seconds'));
+                    index = i;
+                }
+            });
+            res.json(
+                {
+                    _id: data[index]._id,
+                    temperature: data[index].temperature,
+                    humidity: data[index].humidity,
+                    pressure: data[index].pressure,
+                    station_id: data[index].station_id,
+                    created_on: moment(data[index].created_on).tz('Europe/Madrid').format('DD-MM-YYYY HH:mm:ss'),
+                }
+            )
         })
         .catch(err=>next(err));
     },
