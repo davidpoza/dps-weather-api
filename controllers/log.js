@@ -72,20 +72,23 @@ let controller = {
     },
 
     getLastData: (req, res, next) => {
-        Measurement.find({ station_id: req.params.station_id })
+        Measurement.findOne({ station_id: req.params.station_id })
         .sort({'created_on': 'descending'})
         .limit(1)
         .then(data=>{
-            res.json(data.map(d=>(
+            if (!data) {
+                throw new error_types.Error404("There are no measurements.");
+            }
+            res.json(
                 {
-                    _id: d._id,
-                    temperature: d.temperature,
-                    humidity: d.humidity,
-                    pressure: d.pressure,
-                    station_id: d.station_id,
-                    created_on: moment(d.created_on).tz('Europe/Madrid').format('DD-MM-YYYY HH:mm:ss'),
+                    _id: data._id,
+                    temperature: data.temperature,
+                    humidity: data.humidity,
+                    pressure: data.pressure,
+                    station_id: data.station_id,
+                    created_on: moment(data.created_on).tz('Europe/Madrid').format('DD-MM-YYYY HH:mm:ss'),
                 }
-            )));
+            );
         })
         .catch(err=>next(err));
     },
