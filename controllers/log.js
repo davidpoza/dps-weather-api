@@ -53,8 +53,8 @@ let controller = {
      *  @param {ßtring} station_id - HOME_INDOOR
      */
     getData: (req, res, next) => {
-        const date = new moment(req.params.date, 'YYYY-MM-DD').valueOf();
-        const date_next = new moment(date).add(24, 'hours').valueOf();
+        const date = new moment.tz(req.params.date, 'YYYY-MM-DD', 'Europe/Madrid').valueOf();
+        const date_next = new moment.tz(date, 'Europe/Madrid').add(24, 'hours').valueOf();
         Measurement.find({ station_id: req.params.station_id, created_on: {$gte: date, $lte: date_next} })
             .then(data=>{
                 res.json(data.map(d=>(
