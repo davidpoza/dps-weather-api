@@ -29,6 +29,7 @@ let controller = {
             temperature: req.body.temperature,
             humidity: req.body.humidity,
             pressure: req.body.pressure,
+            wind: req.body.wind,
             station_id: req.body.station_id,
         });
 
@@ -40,6 +41,7 @@ let controller = {
                     temperature: data.temperature,
                     humidity: data.humidity,
                     pressure: data.pressure,
+                    wind: data.wind,
                     station_id: data.station_id,
                     created_on: moment(data.created_on).tz('Europe/Madrid').format('DD-MM-YYYY HH:mm:ss'),
                 });
@@ -63,6 +65,7 @@ let controller = {
                         temperature: d.temperature,
                         humidity: d.humidity,
                         pressure: d.pressure,
+                        wind: d.wind,
                         station_id: d.station_id,
                         created_on: moment(d.created_on).tz('Europe/Madrid').format('DD-MM-YYYY HH:mm:ss'),
                     }
@@ -85,6 +88,7 @@ let controller = {
                     temperature: data.temperature,
                     humidity: data.humidity,
                     pressure: data.pressure,
+                    wind: data.wind,
                     station_id: data.station_id,
                     created_on: moment(data.created_on).tz('Europe/Madrid').format('DD-MM-YYYY HH:mm:ss'),
                 }
@@ -125,6 +129,7 @@ let controller = {
                     temperature: data[index].temperature,
                     humidity: data[index].humidity,
                     pressure: data[index].pressure,
+                    wind: data[index].wind,
                     station_id: data[index].station_id,
                     created_on: moment(data[index].created_on).tz('Europe/Madrid').format('DD-MM-YYYY HH:mm:ss'),
                 }
